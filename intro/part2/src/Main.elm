@@ -4,23 +4,21 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 
 
+viewTags : List String -> Html msg
 viewTags tags =
     let
         renderedTags =
-            -- 👉 TODO: use `List.map` and `viewTag` to render the tags
-            []
+            List.map viewTag tags
     in
     div [ class "tag-list" ] renderedTags
 
 
+viewTag : String -> Html msg
 viewTag tagName =
-    {- 👉 TODO: render something like this:
-
-       <button class="tag-pill tag-default">tag name goes here</button>
-    -}
-    button [] []
+    button [ class "tag-pill tag-default" ] [ text tagName ]
 
 
+main : Html msg
 main =
     let
         tags =
@@ -34,9 +32,7 @@ main =
                 , div [ class "col-md-3" ]
                     [ div [ class "sidebar" ]
                         [ p [] [ text "Popular Tags" ]
-
-                        -- 👉 TODO: instead of passing [] to viewTags, pass the actual tags
-                        , viewTags []
+                        , viewTags tags
                         ]
                     ]
                 ]
@@ -44,6 +40,7 @@ main =
         ]
 
 
+viewBanner : Html msg
 viewBanner =
     div [ class "banner" ]
         [ div [ class "container" ]
@@ -53,5 +50,6 @@ viewBanner =
         ]
 
 
+viewFeed : Html msg
 viewFeed =
     div [ class "feed-toggle" ] [ text "(We’ll display some articles here later.)" ]
