@@ -1,6 +1,5 @@
 module Avatar exposing (Avatar, decoder, encode, src, toMaybeString)
 
-import Asset
 import Html exposing (Attribute)
 import Html.Attributes
 import Json.Decode as Decode exposing (Decoder)
@@ -40,12 +39,12 @@ src (Avatar maybeUrl) =
 
 resolveAvatarUrl : Maybe String -> String
 resolveAvatarUrl maybeUrl =
-    {- 👉 TODO #1 of 2: return the user's avatar from maybeUrl, if maybeUrl actually
-       contains one. If maybeUrl is Nothing, return this URL instead:
+    case maybeUrl of
+        Just url ->
+            url
 
-          https://static.productionready.io/images/smiley-cyrus.jpg
-    -}
-    ""
+        Nothing ->
+            "smiley-cyrus.jpg"
 
 
 encode : Avatar -> Value

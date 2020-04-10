@@ -5,22 +5,17 @@ import Article exposing (Article, Full)
 import Article.Body exposing (Body)
 import Article.Slug as Slug exposing (Slug)
 import Article.Tag
-import Browser.Navigation as Nav
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, disabled, href, id, placeholder, type_, value)
+import Html.Attributes exposing (attribute, class, disabled, placeholder, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http
 import HttpBuilder exposing (withBody, withExpect)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Loading
-import Page
-import Profile exposing (Profile)
 import Route
 import Session exposing (Session)
-import Task exposing (Task)
-import Time
-import Viewer exposing (Viewer)
+import Task
 import Viewer.Cred as Cred exposing (Cred)
 
 
@@ -146,13 +141,13 @@ viewAuthenticated cred model =
                 LoadingSlowly _ ->
                     [ Loading.icon ]
 
-                Saving slug form ->
+                Saving _ form ->
                     [ viewForm cred form (editArticleSaveButton [ disabled True ]) ]
 
                 Creating form ->
                     [ viewForm cred form (newArticleSaveButton [ disabled True ]) ]
 
-                Editing slug problems form ->
+                Editing _ problems form ->
                     [ viewProblems problems
                     , viewForm cred form (editArticleSaveButton [])
                     ]
@@ -296,7 +291,7 @@ update msg model =
             , Cmd.none
             )
 
-        CompletedArticleLoad (Err ( slug, error )) ->
+        CompletedArticleLoad (Err ( slug, _ )) ->
             ( { model | status = LoadingFailed slug }
             , Cmd.none
             )
@@ -555,23 +550,9 @@ create (Trimmed form) cred =
 
 toTagList : String -> List String
 toTagList tagString =
-    {- 👉 TODO #2 of 2: add another |> to the end of this pipeline,
-       which filters out any remaining empty strings.
-
-       To see if the bug is fixed, visit http://localhost:3000/#/editor
-       (you'll need to be logged in) and create an article with tags that have
-       multiple spaces between them, e.g. "tag1     tag2     tag3"
-
-       If the bug has not been fixed, trying to save an article with those tags
-       will result in an error! If it has been fixed, saving will work and the
-       tags will be accepted.
-
-       💡 HINT: Here's how to keep only the "foo" strings in a list of strings:
-
-       List.filter (\str -> str == "foo") listOfStrings
-    -}
     String.split " " tagString
         |> List.map String.trim
+        |> List.filter (\tag -> String.isEmpty tag |> not)
 
 
 edit : Slug -> TrimmedForm -> Cred -> Http.Request (Article Full)
