@@ -1,18 +1,15 @@
 module Page.Register exposing (Model, Msg, init, subscriptions, toSession, update, view)
 
 import Api
-import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Decode as Decode exposing (Decoder, decodeString, field, string)
-import Json.Decode.Pipeline exposing (optional)
+import Json.Decode as Decode exposing (field, string)
 import Json.Encode as Encode
-import Route exposing (Route)
+import Route
 import Session exposing (Session)
 import Viewer exposing (Viewer)
-import Viewer.Cred as Cred exposing (Cred)
 
 
 
@@ -86,11 +83,7 @@ viewForm form =
             [ input
                 [ class "form-control form-control-lg"
                 , placeholder "Username"
-
-                {- 👉 TODO: when the user inputs a username, update it in the Model.
-
-                   💡 HINT: Look at how the Email input below does this. 👇
-                -}
+                , onInput EnteredUsername
                 , value form.username
                 ]
                 []
@@ -139,6 +132,7 @@ viewProblem problem =
 
 type Msg
     = SubmittedForm
+    | EnteredUsername String
     | EnteredEmail String
     | EnteredPassword String
     | CompletedRegister (Result Http.Error Viewer)
@@ -148,6 +142,9 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        EnteredUsername username ->
+            updateForm (\form -> { form | username = username }) model
+
         EnteredEmail email ->
             updateForm (\form -> { form | email = email }) model
 
