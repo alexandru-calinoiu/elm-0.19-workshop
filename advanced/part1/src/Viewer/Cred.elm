@@ -12,26 +12,23 @@ import Username exposing (Username)
 
 
 type Cred
-    = Cred Internals
+    = Cred Username String
 
 
-type alias Internals =
-    { username : Username
-    , token : String
-    }
+
+-- INFO
 
 
 username : Cred -> Username
-username (Cred internal) =
-    internal.username
+username (Cred uname _) =
+    uname
 
 
 decoder : Decoder Cred
 decoder =
-    Decode.succeed Internals
+    Decode.succeed Cred
         |> required "username" Username.decoder
         |> required "token" Decode.string
-        |> Decode.map Cred
 
 
 
@@ -39,14 +36,14 @@ decoder =
 
 
 encodeToken : Cred -> Value
-encodeToken (Cred internals) =
-    Encode.string internals.token
+encodeToken (Cred _ token) =
+    Encode.string token
 
 
 addHeader : Cred -> RequestBuilder a -> RequestBuilder a
-addHeader (Cred internal) builder =
+addHeader (Cred _ token) builder =
     builder
-        |> withHeader "authorization" ("Token " ++ internal.token)
+        |> withHeader "authorization" ("Token " ++ token)
 
 
 addHeaderIfAvailable : Maybe Cred -> RequestBuilder a -> RequestBuilder a
