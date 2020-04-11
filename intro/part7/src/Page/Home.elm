@@ -12,7 +12,7 @@ import Browser.Dom as Dom
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, classList, href, id, placeholder)
 import Html.Events exposing (onClick)
-import Http
+import Http exposing (Error(..))
 import HttpBuilder
 import Loading
 import Log
@@ -271,7 +271,7 @@ update msg model =
             ( { model | feed = Loaded feed }, Cmd.none )
 
         CompletedFeedLoad (Err error) ->
-            ( { model | feed = Failed }, Cmd.none )
+            ( { model | feed = Failed }, Log.error )
 
         CompletedTagsLoad (Ok tags) ->
             ( { model | tags = Loaded tags }, Cmd.none )
