@@ -1,4 +1,4 @@
-module Viewer.Cred exposing (Cred, addHeader, addHeaderIfAvailable, decoder, encodeToken)
+module Viewer.Cred exposing (Cred, addHeader, addHeaderIfAvailable, decoder, encodeToken, username)
 
 import HttpBuilder exposing (RequestBuilder, withHeader)
 import Json.Decode as Decode exposing (Decoder)
@@ -11,29 +11,27 @@ import Username exposing (Username)
 -- TYPES
 
 
-type alias Cred =
-    {- 👉 TODO: Make Cred an opaque type, then fix the resulting compiler errors.
-       Afterwards, it should no longer be possible for any other module to access
-       this `token` value directly!
+type Cred
+    = Cred Internals
 
-       💡 HINT: Other modules still depend on being able to access the
-       `username` value. Expand this module's API to expose a new way for them
-       to access the `username` without also giving them access to `token`.
-    -}
+
+type alias Internals =
     { username : Username
     , token : String
     }
 
 
-
--- SERIALIZATION
+username : Cred -> Username
+username (Cred internal) =
+    internal.username
 
 
 decoder : Decoder Cred
 decoder =
-    Decode.succeed Cred
+    Decode.succeed Internals
         |> required "username" Username.decoder
         |> required "token" Decode.string
+        |> Decode.map Cred
 
 
 
@@ -41,14 +39,14 @@ decoder =
 
 
 encodeToken : Cred -> Value
-encodeToken cred =
-    Encode.string cred.token
+encodeToken (Cred internals) =
+    Encode.string internals.token
 
 
 addHeader : Cred -> RequestBuilder a -> RequestBuilder a
-addHeader cred builder =
+addHeader (Cred internal) builder =
     builder
-        |> withHeader "authorization" ("Token " ++ cred.token)
+        |> withHeader "authorization" ("Token " ++ internal.token)
 
 
 addHeaderIfAvailable : Maybe Cred -> RequestBuilder a -> RequestBuilder a

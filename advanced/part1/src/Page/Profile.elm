@@ -4,26 +4,24 @@ module Page.Profile exposing (Model, Msg, init, subscriptions, toSession, update
 -}
 
 import Api
-import Article exposing (Article, Preview)
 import Article.Feed as Feed
-import Article.FeedSources as FeedSources exposing (FeedSources, Source(..))
+import Article.FeedSources exposing (Source(..))
 import Author exposing (Author(..), FollowedAuthor, UnfollowedAuthor)
-import Avatar exposing (Avatar)
+import Avatar
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
-import HttpBuilder exposing (RequestBuilder)
+import HttpBuilder
 import Loading
 import Log
 import Page
-import PaginatedList exposing (PaginatedList)
-import Profile exposing (Profile)
+import PaginatedList
+import Profile
 import Route
 import Session exposing (Session)
-import Task exposing (Task)
+import Task
 import Time
 import Username exposing (Username)
-import Viewer exposing (Viewer)
 import Viewer.Cred as Cred exposing (Cred)
 
 
@@ -149,10 +147,10 @@ view model =
                 Loaded (IsViewer _ _) ->
                     myProfileTitle
 
-                Loaded ((IsFollowing followedAuthor) as author) ->
+                Loaded ((IsFollowing _) as author) ->
                     titleForOther (Author.username author)
 
-                Loaded ((IsNotFollowing unfollowedAuthor) as author) ->
+                Loaded ((IsNotFollowing _) as author) ->
                     titleForOther (Author.username author)
 
                 Loading username ->
@@ -257,7 +255,7 @@ titleForMe : Maybe Cred -> Username -> String
 titleForMe maybeCred username =
     case maybeCred of
         Just cred ->
-            if username == cred.username then
+            if username == Cred.username cred then
                 myProfileTitle
 
             else
@@ -361,7 +359,7 @@ update msg model =
         CompletedAuthorLoad (Ok author) ->
             ( { model | author = Loaded author }, Cmd.none )
 
-        CompletedAuthorLoad (Err ( username, err )) ->
+        CompletedAuthorLoad (Err ( username, _ )) ->
             ( { model | author = Failed username }
             , Log.error
             )
@@ -371,7 +369,7 @@ update msg model =
             , Cmd.none
             )
 
-        CompletedFeedLoad (Err ( username, err )) ->
+        CompletedFeedLoad (Err ( username, _ )) ->
             ( { model | feed = Failed username }
             , Log.error
             )

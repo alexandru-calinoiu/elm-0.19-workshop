@@ -2,7 +2,7 @@ module Api exposing (addServerError, decodeErrors, url)
 
 import Http
 import Json.Decode as Decode exposing (Decoder, decodeString, field, string)
-import Json.Decode.Pipeline as Pipeline exposing (optional)
+import Json.Decode.Pipeline exposing (optional)
 import Url.Builder
 
 

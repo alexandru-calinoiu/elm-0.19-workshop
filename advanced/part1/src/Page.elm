@@ -7,10 +7,9 @@ import Html.Attributes exposing (class, classList, href, style)
 import Html.Events exposing (onClick)
 import Profile
 import Route exposing (Route)
-import Session exposing (Session)
 import Username exposing (Username)
 import Viewer exposing (Viewer)
-import Viewer.Cred as Cred exposing (Cred)
+import Viewer.Cred as Cred
 
 
 {-| Determines which navbar link (if any) will be rendered as active.
@@ -42,7 +41,7 @@ in the header. (This comes up during slow page transitions.)
 view : Maybe Viewer -> Page -> { title : String, content : Html msg } -> Document msg
 view maybeViewer page { title, content } =
     { title = title ++ " - Conduit"
-    , body = viewHeader page maybeViewer :: content :: [ viewFooter ]
+    , body = [ viewHeader page maybeViewer, content, viewFooter ]
     }
 
 
@@ -71,14 +70,14 @@ viewMenu page maybeViewer =
                 cred =
                     Viewer.cred viewer
 
-                { username } =
-                    cred
+                username =
+                    Cred.username cred
 
                 avatar =
                     Profile.avatar (Viewer.profile viewer)
             in
-            [ linkTo Route.NewArticle [ i [ class "ion-compose" ] [], text " New Post" ]
-            , linkTo Route.Settings [ i [ class "ion-gear-a" ] [], text " Settings" ]
+            [ linkTo Route.NewArticle [ i [ class "ion-compose" ] [], text "\u{00A0}New Post" ]
+            , linkTo Route.Settings [ i [ class "ion-gear-a" ] [], text "\u{00A0}Settings" ]
             , linkTo
                 (Route.Profile username)
                 [ img [ class "user-pic", Avatar.src avatar ] []

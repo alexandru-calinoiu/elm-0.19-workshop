@@ -6,14 +6,9 @@ Contrast with Cred, which is the currently signed-in user.
 
 -}
 
-import Api
 import Avatar exposing (Avatar)
-import Http
-import HttpBuilder exposing (RequestBuilder, withExpect)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
-import Username exposing (Username)
-import Viewer.Cred as Cred exposing (Cred)
 
 
 

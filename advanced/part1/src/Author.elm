@@ -1,20 +1,19 @@
-module Author
-    exposing
-        ( Author(..)
-        , FollowedAuthor
-        , UnfollowedAuthor
-        , decoder
-        , fetch
-        , follow
-        , followButton
-        , profile
-        , requestFollow
-        , requestUnfollow
-        , unfollow
-        , unfollowButton
-        , username
-        , view
-        )
+module Author exposing
+    ( Author(..)
+    , FollowedAuthor
+    , UnfollowedAuthor
+    , decoder
+    , fetch
+    , follow
+    , followButton
+    , profile
+    , requestFollow
+    , requestUnfollow
+    , unfollow
+    , unfollowButton
+    , username
+    , view
+    )
 
 {-| The author of an Article. It includes a Profile.
 
@@ -49,17 +48,15 @@ There are still ways we could mess things up (e.g. make a button that calls Auth
 
 import Api
 import Html exposing (Html, a, i, text)
-import Html.Attributes exposing (attribute, class, href, id, placeholder)
+import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Http
 import HttpBuilder exposing (RequestBuilder, withExpect)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (custom, optional, required)
-import Json.Encode as Encode exposing (Value)
 import Profile exposing (Profile)
-import Route exposing (Route)
+import Route
 import Username exposing (Username)
-import Viewer exposing (Viewer)
 import Viewer.Cred as Cred exposing (Cred)
 
 
@@ -95,7 +92,7 @@ username : Author -> Username
 username author =
     case author of
         IsViewer cred _ ->
-            cred.username
+            Cred.username cred
 
         IsFollowing (FollowedAuthor val _) ->
             val
@@ -192,7 +189,7 @@ toggleFollowButton txt extraClasses msgWhenClicked uname =
             "btn btn-sm " ++ String.join " " extraClasses ++ " action-btn"
 
         caption =
-            " " ++ txt ++ " " ++ Username.toString uname
+            "\u{00A0}" ++ txt ++ " " ++ Username.toString uname
     in
     Html.button [ class classStr, onClick msgWhenClicked ]
         [ i [ class "ion-plus-round" ] []
@@ -220,7 +217,7 @@ decodeFromPair maybeCred ( prof, uname ) =
             Decode.succeed (IsNotFollowing (UnfollowedAuthor uname prof))
 
         Just cred ->
-            if uname == cred.username then
+            if uname == Cred.username cred then
                 Decode.succeed (IsViewer cred prof)
 
             else
