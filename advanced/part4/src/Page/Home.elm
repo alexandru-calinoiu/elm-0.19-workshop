@@ -4,24 +4,21 @@ module Page.Home exposing (Model, Msg, init, subscriptions, toSession, update, v
 -}
 
 import Api
-import Article exposing (Article, Preview)
 import Article.Feed as Feed
-import Article.FeedSources as FeedSources exposing (FeedSources, Source(..))
+import Article.FeedSources exposing (Source(..))
 import Article.Tag as Tag exposing (Tag)
 import Browser.Dom as Dom
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, classList, href, id, placeholder)
+import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Http
 import HttpBuilder
 import Loading
 import Log
-import Page
-import PaginatedList exposing (PaginatedList)
+import PaginatedList
 import Session exposing (Session)
 import Task exposing (Task)
 import Time
-import Username exposing (Username)
 import Viewer.Cred as Cred exposing (Cred)
 
 
@@ -103,7 +100,7 @@ view model =
                             Loaded feed ->
                                 [ div [ class "feed-toggle" ] <|
                                     List.concat
-                                        [ [ viewTabs model ]
+                                        [ [ viewTabs (Session.cred model.session) model.feedTab ]
                                         , Feed.viewArticles model.timeZone feed
                                             |> List.map (Html.map GotFeedMsg)
                                         , [ Feed.viewPagination ClickedFeedPage feed ]
@@ -155,21 +152,16 @@ viewBanner =
 -- TABS
 
 
-{-| 👉 TODO: refactor this to accept narrower types than the entire Model.
-
-    💡 HINT: It may end up with multiple arguments!
-
--}
-viewTabs : Model -> Html Msg
-viewTabs model =
-    case model.feedTab of
+viewTabs : Maybe Cred -> FeedTab -> Html Msg
+viewTabs maybeCred feedTab =
+    case feedTab of
         YourFeed cred ->
             Feed.viewTabs [] (yourFeed cred) [ globalFeed ]
 
         GlobalFeed ->
             let
                 otherTabs =
-                    case Session.cred model.session of
+                    case maybeCred of
                         Just cred ->
                             [ yourFeed cred ]
 
@@ -181,7 +173,7 @@ viewTabs model =
         TagFeed tag ->
             let
                 otherTabs =
-                    case Session.cred model.session of
+                    case maybeCred of
                         Just cred ->
                             [ yourFeed cred, globalFeed ]
 
@@ -272,7 +264,7 @@ update msg model =
         CompletedFeedLoad (Ok feed) ->
             ( { model | feed = Loaded feed }, Cmd.none )
 
-        CompletedFeedLoad (Err error) ->
+        CompletedFeedLoad (Err _) ->
             ( { model | feed = Failed }, Cmd.none )
 
         CompletedTagsLoad (Ok tags) ->
