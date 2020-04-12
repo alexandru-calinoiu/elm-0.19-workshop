@@ -6,22 +6,20 @@ module Page.Home exposing (Model, Msg, init, subscriptions, toSession, update, v
 import Api
 import Article exposing (Article, Preview)
 import Article.Feed as Feed
-import Article.FeedSources as FeedSources exposing (FeedSources, Source(..))
+import Article.FeedSources exposing (Source(..))
 import Article.Tag as Tag exposing (Tag)
 import Browser.Dom as Dom
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, classList, href, id, placeholder)
+import Html.Attributes exposing (class, classList, href)
 import Html.Events exposing (onClick)
 import Http
 import HttpBuilder
 import Loading
 import Log
-import Page
 import PaginatedList exposing (PaginatedList, page, total)
 import Session exposing (Session)
 import Task exposing (Task)
 import Time
-import Username exposing (Username)
 import Viewer.Cred as Cred exposing (Cred)
 
 
@@ -109,7 +107,7 @@ view model =
                                           ]
                                         , Feed.viewArticles model.timeZone feed
                                             |> List.map (Html.map GotFeedMsg)
-                                        , [ viewPagination (Feed.articles feed) ]
+                                        , [ PaginatedList.view (Feed.articles feed) ClickedFeedPage ]
                                         ]
                                 ]
 
@@ -151,46 +149,6 @@ viewBanner =
             [ h1 [ class "logo-font" ] [ text "conduit" ]
             , p [] [ text "A place to share your knowledge." ]
             ]
-        ]
-
-
-
--- PAGINATION
-
-
-{-| 👉 TODO: Relocate `viewPagination` into `PaginatedList.view` and make it reusable,
-then refactor both Page.Home and Page.Profile to use it!
-
-💡 HINT: Make `PaginatedList.view` return `Html msg` instead of `Html Msg`.
-(You'll need to introduce at least one extra argument for this to work.)
-
--}
-viewPagination : PaginatedList (Article Preview) -> Html Msg
-viewPagination list =
-    let
-        viewPageLink currentPage =
-            pageLink currentPage (currentPage == page list)
-    in
-    if total list > 1 then
-        List.range 1 (total list)
-            |> List.map viewPageLink
-            |> ul [ class "pagination" ]
-
-    else
-        Html.text ""
-
-
-pageLink : Int -> Bool -> Html Msg
-pageLink targetPage isActive =
-    li [ classList [ ( "page-item", True ), ( "active", isActive ) ] ]
-        [ a
-            [ class "page-link"
-            , onClick (ClickedFeedPage targetPage)
-
-            -- The RealWorld CSS requires an href to work properly.
-            , href ""
-            ]
-            [ text (String.fromInt targetPage) ]
         ]
 
 
@@ -310,7 +268,7 @@ update msg model =
         CompletedFeedLoad (Ok feed) ->
             ( { model | feed = Loaded feed }, Cmd.none )
 
-        CompletedFeedLoad (Err error) ->
+        CompletedFeedLoad (Err _) ->
             ( { model | feed = Failed }, Cmd.none )
 
         CompletedTagsLoad (Ok tags) ->

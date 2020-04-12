@@ -1,4 +1,4 @@
-module PaginatedList exposing (PaginatedList, fromList, fromRequestBuilder, map, page, total, values)
+module PaginatedList exposing (PaginatedList, fromList, fromRequestBuilder, map, page, total, values, view)
 
 import Html exposing (Html, a, li, text, ul)
 import Html.Attributes exposing (class, classList, href)
@@ -87,3 +87,32 @@ fromRequestBuilder resultsPerPage pageNumber builder =
 
 
 -- VIEW
+
+
+view : PaginatedList a -> (Int -> msg) -> Html msg
+view list toMsg =
+    let
+        viewPageLink currentPage =
+            pageLink currentPage (currentPage == page list) toMsg
+    in
+    if total list > 1 then
+        List.range 1 (total list)
+            |> List.map viewPageLink
+            |> ul [ class "pagination" ]
+
+    else
+        Html.text ""
+
+
+pageLink : Int -> Bool -> (Int -> msg) -> Html msg
+pageLink targetPage isActive toMsg =
+    li [ classList [ ( "page-item", True ), ( "active", isActive ) ] ]
+        [ a
+            [ class "page-link"
+            , onClick (toMsg targetPage)
+
+            -- The RealWorld CSS requires an href to work properly.
+            , href ""
+            ]
+            [ text (String.fromInt targetPage) ]
+        ]

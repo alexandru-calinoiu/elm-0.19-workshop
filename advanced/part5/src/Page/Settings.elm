@@ -2,17 +2,15 @@ module Page.Settings exposing (Model, Msg, init, subscriptions, toSession, updat
 
 import Api
 import Avatar
-import Browser.Navigation as Nav
 import Email exposing (Email)
 import Html exposing (Html, button, div, fieldset, h1, input, li, text, textarea, ul)
 import Html.Attributes exposing (attribute, class, placeholder, type_, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http
 import HttpBuilder
-import Json.Decode as Decode exposing (Decoder, decodeString, field, list, string)
-import Json.Decode.Pipeline exposing (optional)
+import Json.Decode as Decode exposing (field, string)
 import Json.Encode as Encode
-import Profile exposing (Profile)
+import Profile
 import Route
 import Session exposing (Session)
 import Username as Username exposing (Username)
@@ -262,7 +260,7 @@ update msg model =
 {-| Helper function for `update`. Updates the form and returns Cmd.none and
 Ignored. Useful for recording form fields!
 -}
-updateForm : (Form -> Form) -> Model -> ( Model, Cmd Msg )
+updateForm : (Form -> Form) -> Model -> ( Model, Cmd msg )
 updateForm transform model =
     ( { model | form = transform model.form }, Cmd.none )
 

@@ -1,14 +1,13 @@
-module Article.Feed
-    exposing
-        ( Model
-        , Msg
-        , articles
-        , decoder
-        , init
-        , update
-        , viewArticles
-        , viewTabs
-        )
+module Article.Feed exposing
+    ( Model
+    , Msg
+    , articles
+    , decoder
+    , init
+    , update
+    , viewArticles
+    , viewTabs
+    )
 
 import Api
 import Article exposing (Article, Preview)
@@ -211,7 +210,7 @@ type Msg
 
 
 update : Maybe Cred -> Msg -> Model -> ( Model, Cmd Msg )
-update maybeCred msg (Model model) =
+update _ msg (Model model) =
     case msg of
         ClickedDismissErrors ->
             ( Model { model | errors = [] }, Cmd.none )
@@ -227,7 +226,7 @@ update maybeCred msg (Model model) =
             , Cmd.none
             )
 
-        CompletedFavorite (Err error) ->
+        CompletedFavorite (Err _) ->
             ( Model { model | errors = Api.addServerError model.errors }
             , Cmd.none
             )

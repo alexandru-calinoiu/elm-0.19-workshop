@@ -4,27 +4,24 @@ module Page.Profile exposing (Model, Msg, init, subscriptions, toSession, update
 -}
 
 import Api
-import Article exposing (Article, Preview)
 import Article.Feed as Feed
-import Article.FeedSources as FeedSources exposing (FeedSources, Source(..))
+import Article.FeedSources exposing (Source(..))
 import Author exposing (Author(..), FollowedAuthor, UnfollowedAuthor)
-import Avatar exposing (Avatar)
+import Avatar
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
 import Http
-import HttpBuilder exposing (RequestBuilder)
+import HttpBuilder
 import Loading
 import Log
 import Page
-import PaginatedList exposing (PaginatedList, page, total)
-import Profile exposing (Profile)
+import PaginatedList
+import Profile
 import Route
 import Session exposing (Session)
-import Task exposing (Task)
+import Task
 import Time
 import Username exposing (Username)
-import Viewer exposing (Viewer)
 import Viewer.Cred as Cred exposing (Cred)
 
 
@@ -150,10 +147,10 @@ view model =
                 Loaded (IsViewer _ _) ->
                     myProfileTitle
 
-                Loaded ((IsFollowing followedAuthor) as author) ->
+                Loaded ((IsFollowing _) as author) ->
                     titleForOther (Author.username author)
 
-                Loaded ((IsNotFollowing unfollowedAuthor) as author) ->
+                Loaded ((IsNotFollowing _) as author) ->
                     titleForOther (Author.username author)
 
                 Loading username ->
@@ -218,7 +215,7 @@ view model =
                                                 [ [ viewTabs model.feedTab ]
                                                 , Feed.viewArticles model.timeZone feed
                                                     |> List.map (Html.map GotFeedMsg)
-                                                , [ viewPagination (Feed.articles feed) ]
+                                                , [ PaginatedList.view (Feed.articles feed) ClickedFeedPage ]
                                                 ]
                                         ]
                                     ]
@@ -243,46 +240,6 @@ view model =
             Failed _ ->
                 Loading.error "profile"
     }
-
-
-
--- PAGINATION
-
-
-{-| 👉 TODO: Relocate `viewPagination` into `PaginatedList.view` and make it reusable,
-then refactor both Page.Home and Page.Profile to use it!
-
-💡 HINT: Make `PaginatedList.view` return `Html msg` instead of `Html Msg`.
-(You'll need to introduce at least one extra argument for this to work.)
-
--}
-viewPagination : PaginatedList (Article Preview) -> Html Msg
-viewPagination list =
-    let
-        viewPageLink currentPage =
-            pageLink currentPage (currentPage == page list)
-    in
-    if total list > 1 then
-        List.range 1 (total list)
-            |> List.map viewPageLink
-            |> ul [ class "pagination" ]
-
-    else
-        Html.text ""
-
-
-pageLink : Int -> Bool -> Html Msg
-pageLink targetPage isActive =
-    li [ classList [ ( "page-item", True ), ( "active", isActive ) ] ]
-        [ a
-            [ class "page-link"
-            , onClick (ClickedFeedPage targetPage)
-
-            -- The RealWorld CSS requires an href to work properly.
-            , href ""
-            ]
-            [ text (String.fromInt targetPage) ]
-        ]
 
 
 
@@ -402,7 +359,7 @@ update msg model =
         CompletedAuthorLoad (Ok author) ->
             ( { model | author = Loaded author }, Cmd.none )
 
-        CompletedAuthorLoad (Err ( username, err )) ->
+        CompletedAuthorLoad (Err ( username, _ )) ->
             ( { model | author = Failed username }
             , Log.error
             )
@@ -412,7 +369,7 @@ update msg model =
             , Cmd.none
             )
 
-        CompletedFeedLoad (Err ( username, err )) ->
+        CompletedFeedLoad (Err ( username, _ )) ->
             ( { model | feed = Failed username }
             , Log.error
             )
