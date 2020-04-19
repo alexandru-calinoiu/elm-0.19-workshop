@@ -1,23 +1,19 @@
-port module Session
-    exposing
-        ( Session
-        , changes
-        , cred
-        , decode
-        , login
-        , logout
-        , navKey
-        , viewer
-        )
+port module Session exposing
+    ( Session
+    , changes
+    , cred
+    , decode
+    , login
+    , logout
+    , navKey
+    , viewer
+    )
 
 import Browser.Navigation as Nav
-import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (custom, required)
+import Json.Decode as Decode
 import Json.Encode as Encode exposing (Value)
-import Profile exposing (Profile)
-import Time
 import Viewer exposing (Viewer)
-import Viewer.Cred as Cred exposing (Cred)
+import Viewer.Cred exposing (Cred)
 
 
 

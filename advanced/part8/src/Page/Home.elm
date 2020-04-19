@@ -4,24 +4,21 @@ module Page.Home exposing (Model, Msg, init, subscriptions, toSession, update, v
 -}
 
 import Api
-import Article exposing (Article, Preview)
 import Article.Feed as Feed
-import Article.FeedSources as FeedSources exposing (FeedSources, Source(..))
+import Article.FeedSources exposing (Source(..))
 import Article.Tag as Tag exposing (Tag)
 import Browser.Dom as Dom
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, classList, href, id, placeholder)
+import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Http
 import HttpBuilder
 import Loading
 import Log
-import Page
-import PaginatedList exposing (PaginatedList)
+import PaginatedList
 import Session exposing (Session)
 import Task exposing (Task)
 import Time
-import Username exposing (Username)
 import Viewer.Cred as Cred exposing (Cred)
 
 
@@ -270,7 +267,7 @@ update msg model =
         CompletedFeedLoad (Ok feed) ->
             ( { model | feed = Loaded feed }, Cmd.none )
 
-        CompletedFeedLoad (Err error) ->
+        CompletedFeedLoad (Err _) ->
             ( { model | feed = Failed }, Cmd.none )
 
         CompletedTagsLoad (Ok tags) ->

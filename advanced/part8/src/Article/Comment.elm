@@ -1,29 +1,25 @@
-module Article.Comment
-    exposing
-        ( Comment
-        , author
-        , body
-        , createdAt
-        , delete
-        , id
-        , list
-        , post
-        )
+module Article.Comment exposing
+    ( Comment
+    , author
+    , body
+    , createdAt
+    , delete
+    , id
+    , list
+    , post
+    )
 
 import Api
-import Article exposing (Article)
 import Article.Slug as Slug exposing (Slug)
 import Author exposing (Author)
 import CommentId exposing (CommentId)
 import Http
-import HttpBuilder exposing (RequestBuilder, withExpect, withQueryParams)
+import HttpBuilder exposing (withExpect)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (custom, required)
+import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode exposing (Value)
-import Profile exposing (Profile)
 import Time
 import Timestamp
-import Viewer exposing (Viewer)
 import Viewer.Cred as Cred exposing (Cred)
 
 

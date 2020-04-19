@@ -1,23 +1,22 @@
-module Article
-    exposing
-        ( Article
-        , Full
-        , Preview
-        , author
-        , body
-        , favorite
-        , favoriteButton
-        , fetch
-        , fromPreview
-        , fullDecoder
-        , mapAuthor
-        , metadata
-        , previewDecoder
-        , slug
-        , unfavorite
-        , unfavoriteButton
-        , url
-        )
+module Article exposing
+    ( Article
+    , Full
+    , Preview
+    , author
+    , body
+    , favorite
+    , favoriteButton
+    , fetch
+    , fromPreview
+    , fullDecoder
+    , mapAuthor
+    , metadata
+    , previewDecoder
+    , slug
+    , unfavorite
+    , unfavoriteButton
+    , url
+    )
 
 {-| The interface to the Article data structure.
 
@@ -33,22 +32,16 @@ This includes:
 import Api
 import Article.Body as Body exposing (Body)
 import Article.Slug as Slug exposing (Slug)
-import Article.Tag as Tag exposing (Tag)
 import Author exposing (Author)
 import Html exposing (Attribute, Html, i)
 import Html.Attributes exposing (class)
 import Html.Events exposing (stopPropagationOn)
 import Http
-import HttpBuilder exposing (RequestBuilder, withBody, withExpect, withQueryParams)
+import HttpBuilder exposing (RequestBuilder, withExpect)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (custom, hardcoded, required)
-import Json.Encode as Encode
-import Markdown
-import Profile exposing (Profile)
 import Time
 import Timestamp
-import Username as Username exposing (Username)
-import Viewer exposing (Viewer)
 import Viewer.Cred as Cred exposing (Cred)
 
 
