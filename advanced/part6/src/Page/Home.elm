@@ -1,28 +1,25 @@
-module Page.Home exposing (Model, Msg, init, subscriptions, toSession, update, view)
+module Page.Home exposing (Model, Msg, globalFeed, init, subscriptions, toSession, update, view)
 
 {-| The homepage. You can get here via either the / or /#/ routes.
 -}
 
 import Api
-import Article exposing (Article, Preview)
 import Article.Feed as Feed
-import Article.FeedSources as FeedSources exposing (FeedSources, Source(..))
+import Article.FeedSources exposing (Source(..))
 import Article.Tag as Tag exposing (Tag)
 import Browser.Dom as Dom
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, classList, href, id, placeholder)
+import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Http
 import HttpBuilder
 import Loading
 import Log
-import Page
-import PaginatedList exposing (PaginatedList)
+import PaginatedList
 import Session exposing (Session)
 import Task exposing (Task)
 import Time
-import Username exposing (Username)
-import Viewer.Cred as Cred exposing (Cred)
+import Viewer.Cred as Cred
 
 
 
@@ -155,46 +152,34 @@ viewBanner =
 -- TABS
 
 
-{-| TODO: Have viewTabs render all the tabs, using `activeTab` as the
-single source of truth for their state.
-
-    The specification for how the tabs work is:
-
-    1. If the user is logged in, render `yourFeed` as the first tab. Examples:
-
-    "Your Feed"    "Global Feed"
-    "Your Feed"    "Global Feed"  "#dragons"
-
-    2. If the user is NOT logged in, do not render `yourFeed` at all. Examples:
-
-    "Global Feed"
-    "Global Feed"  "#dragons"
-
-    3. If the active tab is a `TagFeed`, render that tab last. Show the tag it contains with a "#" in front.
-
-    "Global Feed"  "#dragons"
-    "Your Feed"    "Global Feed"  "#dragons"
-
-    3. If the active tab is NOT a `TagFeed`, do not render a tag tab at all.
-
-    "Your Feed"    "Global Feed"
-    "Global Feed"
-
-    💡 HINT: The 4 declarations after `viewTabs` may be helpful!
-
--}
 viewTabs : Bool -> FeedTab -> Html Msg
 viewTabs isLoggedIn activeTab =
     ul [ class "nav nav-pills outline-active" ] <|
         case activeTab of
             YourFeed ->
-                []
+                [ tabBar [] yourFeed [ globalFeed ] ]
 
             GlobalFeed ->
-                []
+                let
+                    before =
+                        if isLoggedIn == True then
+                            [ yourFeed ]
+
+                        else
+                            []
+                in
+                [ tabBar before globalFeed [] ]
 
             TagFeed tagName ->
-                []
+                let
+                    before =
+                        if isLoggedIn == True then
+                            [ yourFeed, globalFeed ]
+
+                        else
+                            [ globalFeed ]
+                in
+                [ tabBar before (tagFeed tagName) [] ]
 
 
 tabBar :
@@ -301,7 +286,7 @@ update msg model =
         CompletedFeedLoad (Ok feed) ->
             ( { model | feed = Loaded feed }, Cmd.none )
 
-        CompletedFeedLoad (Err error) ->
+        CompletedFeedLoad (Err _) ->
             ( { model | feed = Failed }, Cmd.none )
 
         CompletedTagsLoad (Ok tags) ->
